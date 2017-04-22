@@ -137,13 +137,12 @@ angular.module('ngIntlTelPhone', [])
             }
         };
     }])
-    .directive('formatNumber', ['intlTelInputUtils', function (intlTelInputUtils) {
+    .directive('formatNumber', ['intlTelInputUtils', '$parse', function (intlTelInputUtils, $parse) {
         return {
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, element, attrs, ngModel) {
                 ngModel.$formatters.push(function (value) {
-                    console.log(value);
                     if (intlTelInputUtils.isValid(value, scope.selectedCountry.iso2))
                         return intlTelInputUtils.format(value, scope.selectedCountry.iso2, intlTelInputUtils.NATIONAL);
                     else if (value) {
@@ -164,6 +163,7 @@ angular.module('ngIntlTelPhone', [])
 
                 scope.formatForCountryChange = function () {
                     ngModel.$viewValue = intlTelInputUtils.format(ngModel.$viewValue, scope.selectedCountry.iso2, intlTelInputUtils.NATIONAL);
+                    $parse(attrs['ngModel']).assign(scope, intlTelInputUtils.format(ngModel.$viewValue, scope.selectedCountry.iso2, intlTelInputUtils.E164));
                     ngModel.$render();
                 };
             }
